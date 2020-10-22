@@ -1,0 +1,8 @@
+.metadata
+Debug/
+Lista/
+.settings
+bin/
+tmp/
+*.vcxproj.filters
+*.vcxproj.user
