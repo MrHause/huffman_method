@@ -1,3 +1,0 @@
-﻿  huffman_my.cpp
-C:\Users\mrhau\source\repos\huffman_my\huffman_my\huffman_my.cpp(19,2): error C2371: "Node": zmiana definicji; różne typy podstawowe
-C:\Users\mrhau\source\repos\huffman_my\huffman_my\huffman_my.cpp(16): message : zobacz deklarację „Node”
