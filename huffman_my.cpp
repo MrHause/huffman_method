@@ -56,29 +56,34 @@ void create_list(Node** node, string input_txt) {
 		}
 		temp_node->position.count++;
 	}
-	int a = 0;
-	/*
-	for (uint32_t i = 0; i < input_txt.length(); i++) 
-	{
-		temp_node = *node;                
-		while (temp_node != NULL && (temp_node->position.sign != input_txt[i]) ) {
-				temp_node = temp_node->next;
-		}
-		if (!temp_node)                     
-		{
-			temp_node = new Node;             
-			temp_node->next = *node;            
-			temp_node->left = NULL;            
-			temp_node->right = NULL;
-			temp_node->position.sign = input_txt[i];
-			temp_node->position.count = 0;
-			*node = temp_node;               
-		}
-		temp_node->position.count++;                   
-	}	
-	*/
 }
 
+void sort_list(Node** node) {
+	Node* temp_node;
+	temp_node = *node;
+	bool t;
+	char temp_sign;
+	uint32_t temp_count;
+	do                              // Listę sortujemy rosnąco względem count
+	{
+		t = true;                     // Zakładamy posortowanie listy
+		temp_node = *node;                     // Sortujemy od pierwszego elementu
+		while (temp_node->next)
+		{
+			if (temp_node->position.count > temp_node->next->position.count)
+			{
+				temp_sign = temp_node->position.sign;               // Wymieniamy zawartość dwóch kolejnych elementów
+				temp_node->position.sign = temp_node->next->position.sign;
+				temp_node->next->position.sign = temp_sign;
+				temp_count = temp_node->position.count;
+				temp_node->position.count = temp_node->next->position.count;
+				temp_node->next->position.count = temp_count;
+				t = false;                // Sygnalizujemy nieposortowanie listy
+			}
+			temp_node = temp_node->next;                // Przechodzimy do następnego elementu
+		}
+	} while (!t);
+}
 void Node_free(Node **list)
 {
 	Node* wsk;
@@ -99,6 +104,7 @@ int main()
 
 	create_list( &tree, input_txt );
 
+	sort_list( &tree );
 	Node_free( &tree );
     std::cout << "Hello World!\n";
 }
