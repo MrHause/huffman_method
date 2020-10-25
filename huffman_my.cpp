@@ -95,6 +95,41 @@ void Node_free(Node **list)
 	}
 }
 
+void generate_tree(Node** node) {
+	Node* node1, * node2, * temp_node, *begin_node, *temp_begin_node;
+
+	node1 = *node;	//init
+	node2 = node1->next;	
+
+	while ( node2 != NULL) {
+		//*node = node2->next;
+
+		begin_node = node2->next; //set first node as first from the list
+		//create new node
+		temp_node = new Node;
+		temp_node->left = node1;
+		temp_node->right = node2;
+		temp_node->position.count = node1->position.count + node2->position.count;
+		
+		if (!begin_node || temp_node->position.count <= begin_node->position.count) {	//if the counter is smaller we add the node at the beginning
+			temp_node->next = begin_node;	//set next node
+			begin_node = temp_node;			//set created node as first
+			temp_begin_node = begin_node;
+		}
+		else {
+			temp_begin_node = begin_node;
+			while (begin_node->position.count < temp_node->position.count && begin_node->next != NULL)
+				begin_node = begin_node->next;
+			temp_node->next = begin_node->next;
+			begin_node->next = temp_node;
+		}
+		node1 = temp_begin_node;
+		node2 = temp_begin_node->next;
+		if (temp_begin_node->next == NULL)	//set main pointer as head of the tree
+			*node = temp_begin_node;
+	}
+}
+
 int main()
 {
 	Node* tree;
@@ -105,6 +140,10 @@ int main()
 	create_list( &tree, input_txt );
 
 	sort_list( &tree );
+
+	generate_tree(&tree);
+
 	Node_free( &tree );
+
     std::cout << "Hello World!\n";
 }
