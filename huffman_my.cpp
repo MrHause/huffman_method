@@ -143,11 +143,27 @@ bool CodeT(char c, Node* p, string b){
 	else return CodeT(c, p->left, b + "0") || CodeT(c, p->right, b + "1");
 }
 
-void Compress(Node* root, string input_txt){
-	uint32_t i;
+bool schearch_tree(char c, Node* root, string b) {
+	if( root != NULL ){
+		schearch_tree(c, root->left, b+"0");
+		if (root->position.sign == c) {
+			cout << b;
+			return true;
+		}
+		schearch_tree(c, root->right, b+"1");
+		if (root->position.sign == c) {
+			cout << b;
+			return true;
+		}
+	}
+}
 
-	for (i = 0; i < input_txt.length(); i++)  // Kodujemy poszczególne znaki
-		CodeT(input_txt[i], root, "");
+void Compress(Node* root, string input_txt){
+	for (uint32_t i = 0; i < input_txt.length(); i++) {  // Kodujemy poszczególne znaki
+		//CodeT(input_txt[i], root, "");
+		schearch_tree(input_txt[i], root, "");
+	}
+	cout << endl;
 }
 /*
 void Free_tree(Node** node) {
