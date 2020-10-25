@@ -130,6 +130,37 @@ void generate_tree(Node** node) {
 	}
 }
 
+bool CodeT(char c, Node* p, string b){
+	if (!p->left)
+	{
+		if (c != p->position.sign) return false;
+		else
+		{
+			cout << b;
+			return true;
+		}
+	}
+	else return CodeT(c, p->left, b + "0") || CodeT(c, p->right, b + "1");
+}
+
+void Compress(Node* root, string input_txt){
+	uint32_t i;
+
+	for (i = 0; i < input_txt.length(); i++)  // Kodujemy poszczególne znaki
+		CodeT(input_txt[i], root, "");
+}
+/*
+void Free_tree(Node** node) {
+	Node* temp_node = *node;
+	if (*node)
+	{
+		Free_tree(&temp_node->left);          // usuwamy lewe poddrzewo
+		Free_tree(&temp_node->right);         // usuwamy prawe poddrzewo
+		delete temp_node;                     // usuwamy sam węzeł
+	}
+}
+*/
+
 int main()
 {
 	Node* tree;
@@ -143,7 +174,8 @@ int main()
 
 	generate_tree(&tree);
 
-	Node_free( &tree );
-
+	Compress(tree, input_txt);
+	//Node_free( &tree );
+	//Free_tree(&tree);
     std::cout << "Hello World!\n";
 }
