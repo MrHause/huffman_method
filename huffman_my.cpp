@@ -207,20 +207,31 @@ void save_compress_file(string bits) {
 	File_output.open("output.txt", ios::binary);
 
 	uint8_t byte = 0;
+	uint8_t temp = 0;
 	uint8_t index = 0;
 	for (uint32_t i = 0,j = 1; i < bits.length(); i++,j++) {
 		index = j % 8;
 		//to do
 		byte = byte << 1;
-		if( bits[i] == '1' )
-			byte |= (1 << index);
-
+		if (bits[i] == '1') {
+			temp = 1;
+			byte |= temp;
+		}
 		if (index == 0) {
 			File_output.write((char*)&byte, sizeof(byte));
 			byte = 0;
 		}
 	}
 	File_output.close();
+}
+void delete_tree(Node* root) {
+	Node* node = root;
+	if (node != NULL) {
+		delete_tree(node->left);
+		delete_tree(node->right);
+
+		delete node;
+	}
 }
 
 int main()
@@ -244,7 +255,10 @@ int main()
 	cout << output_str;
 	
 	save_compress_file(output_str);
+
+	delete_tree(tree);
+
 	//Node_free( &tree );
 	//Free_tree(&tree);
-    std::cout << "Hello World!\n";
+    std::cout << "Have a nice day :) \n";
 }
