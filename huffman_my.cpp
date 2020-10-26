@@ -86,6 +86,7 @@ void sort_list(Node** node) {
 		}
 	} while (!t);
 }
+//delete list
 void Node_free(Node **list)
 {
 	Node* wsk;
@@ -96,7 +97,7 @@ void Node_free(Node **list)
 		*list = wsk;
 	}
 }
-
+//function to generate tree
 void generate_tree(Node** node) {
 	Node* node1, * node2, * temp_node, *begin_node, *temp_begin_node;
 
@@ -132,19 +133,6 @@ void generate_tree(Node** node) {
 	}
 }
 
-bool CodeT(char c, Node* p, string b){
-	if (!p->left)
-	{
-		if (c != p->position.sign) return false;
-		else
-		{
-			cout << b;
-			return true;
-		}
-	}
-	else return CodeT(c, p->left, b + "0") || CodeT(c, p->right, b + "1");
-}
-
 bool schearch_tree(char c, Node* root, string b) {
 	if( root != NULL ){
 		schearch_tree(c, root->left, b+"0");
@@ -161,24 +149,14 @@ bool schearch_tree(char c, Node* root, string b) {
 }
 
 void Compress(Node* root, string input_txt){
-	for (uint32_t i = 0; i < input_txt.length(); i++) {  // Kodujemy poszczególne znaki
-		//CodeT(input_txt[i], root, "");
+	for (uint32_t i = 0; i < input_txt.length(); i++) { 
 		schearch_tree(input_txt[i], root, "");
 		cout << " ";
 	}
 	cout << endl;
 }
-/*
-void Free_tree(Node** node) {
-	Node* temp_node = *node;
-	if (*node)
-	{
-		Free_tree(&temp_node->left);          // usuwamy lewe poddrzewo
-		Free_tree(&temp_node->right);         // usuwamy prawe poddrzewo
-		delete temp_node;                     // usuwamy sam węzeł
-	}
-}
-*/
+
+//function add to string the bits that represents particular sign
 bool get_compress_bits(char c, Node* root, string b ) {
 	if (root != NULL) {
 		get_compress_bits(c, root->left, b + "0");
@@ -195,13 +173,15 @@ bool get_compress_bits(char c, Node* root, string b ) {
 		}
 	}
 }
+//store text bits in the string
 void get_bits(Node* node, string input_txt) {
 	string bytes;
-	for (uint32_t i = 0; i < input_txt.length(); i++) {  // Kodujemy poszczególne znaki
+	for (uint32_t i = 0; i < input_txt.length(); i++) {  // code particular sign and store it in string variable
 		get_compress_bits(input_txt[i], node, "");
 	}
 }
 
+//save compress file based on the given bits
 void save_compress_file(string bits) {
 	ofstream File_output;
 	File_output.open("output.txt", ios::binary);
@@ -209,9 +189,9 @@ void save_compress_file(string bits) {
 	uint8_t byte = 0;
 	uint8_t temp = 0;
 	uint8_t index = 0;
-	for (uint32_t i = 0,j = 1; i < bits.length(); i++,j++) {
+
+	for (uint32_t i = 0,j = 1; i < bits.length(); i++,j++) { //compress. add following bits to byte, and when byte is full - save
 		index = j % 8;
-		//to do
 		byte = byte << 1;
 		if (bits[i] == '1') {
 			temp = 1;
@@ -248,8 +228,10 @@ int main()
 	sort_list( &tree );
 
 	generate_tree(&tree);
-
+	
+	//useless function, it just print in the console the bit representation of the particular sign
 	Compress(tree, input_txt);
+
 	cout << endl;
 	get_bits(tree, input_txt);
 	cout << output_str;
