@@ -1,6 +1,7 @@
 ﻿#include <iostream>
 #include <string>
 #include <stdint.h>
+#include <fstream>
 
 using namespace std;
 
@@ -16,6 +17,7 @@ typedef struct node{
 	struct node* right;
 }Node;
 
+string output_str;
 
 //create list that stores signs and qty
 void create_list(Node** node, string input_txt) {
@@ -162,6 +164,7 @@ void Compress(Node* root, string input_txt){
 	for (uint32_t i = 0; i < input_txt.length(); i++) {  // Kodujemy poszczególne znaki
 		//CodeT(input_txt[i], root, "");
 		schearch_tree(input_txt[i], root, "");
+		cout << " ";
 	}
 	cout << endl;
 }
@@ -176,9 +179,54 @@ void Free_tree(Node** node) {
 	}
 }
 */
+bool get_compress_bits(char c, Node* root, string b ) {
+	if (root != NULL) {
+		get_compress_bits(c, root->left, b + "0");
+		if (root->position.sign == c) {
+			//cout << b;
+			output_str += b;
+			return true;
+		}
+		get_compress_bits(c, root->right, b + "1");
+		if (root->position.sign == c) {
+			//cout << b;
+			output_str += b;
+			return true;
+		}
+	}
+}
+void get_bits(Node* node, string input_txt) {
+	string bytes;
+	for (uint32_t i = 0; i < input_txt.length(); i++) {  // Kodujemy poszczególne znaki
+		get_compress_bits(input_txt[i], node, "");
+	}
+}
+
+void save_compress_file(string bits) {
+	ofstream File_output;
+	File_output.open("output.txt", ios::binary);
+
+	uint8_t byte = 0;
+	uint8_t index = 0;
+	for (uint32_t i = 0,j = 1; i < bits.length(); i++,j++) {
+		index = j % 8;
+		//to do
+		byte = byte << 1;
+		if( bits[i] == '1' )
+			byte |= (1 << index);
+
+		if (index == 0) {
+			File_output.write((char*)&byte, sizeof(byte));
+			byte = 0;
+		}
+	}
+	File_output.close();
+}
 
 int main()
 {
+
+
 	Node* tree;
 
 	string input_txt;
@@ -191,6 +239,11 @@ int main()
 	generate_tree(&tree);
 
 	Compress(tree, input_txt);
+	cout << endl;
+	get_bits(tree, input_txt);
+	cout << output_str;
+	
+	save_compress_file(output_str);
 	//Node_free( &tree );
 	//Free_tree(&tree);
     std::cout << "Hello World!\n";
