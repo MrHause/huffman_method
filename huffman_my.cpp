@@ -192,18 +192,6 @@ void save_compress_file(string bits) {
 
 	for (uint32_t i = 0,j = 1; i < bits.length(); i++,j++) { //compress. add following bits to byte, and when byte is full - save
 
-		if (bits.length() - i <= 8) { //stupid but working, save last bits when less than 8 left
-			for (uint8_t it = 0; it < 8; it++) { //save 8bits
-				byte = byte << 1;
-				if ( i < bits.length() ) //check if we have sth to save. if not just add 0 at the end. 
-					if(bits[i] == '1')
-						byte |= 1;
-				i++;
-			}
-			File_output.write((char*)&byte, sizeof(byte));
-			break;
-		}
-
 		index = j % 8;
 		byte = byte << 1;
 		if (bits[i] == '1') {
@@ -213,6 +201,12 @@ void save_compress_file(string bits) {
 		if (index == 0) {
 			File_output.write((char*)&byte, sizeof(byte));
 			byte = 0;
+		}
+		if (i == (bits.length() - 1) && index) {	//if last sign
+			for (uint8_t it = 0; it < (8 - index); it++) //allign to 8 bits
+				byte = byte << 1;
+
+			File_output.write((char*)&byte, sizeof(byte));
 		}
 	}
 	File_output.close();
