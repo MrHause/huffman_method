@@ -256,19 +256,81 @@ string read_compress_file(void) {
 	File_in.close();
 }
 
+string get_unique_signs(Node *node) {
+	string output_signs;
+	Node* temp_node;
+	temp_node = node;
+
+	while (temp_node != NULL) {
+		output_signs += temp_node->position.sign;
+		temp_node = temp_node->next;
+	}
+
+	return output_signs;
+}
+
+bool schearch_sign(char c, Node* root, string b, string &out) {
+	if (root != NULL) {
+		schearch_sign(c, root->left, b + "0", out);
+		if (root->position.sign == c) {
+			//cout << b;
+			out += b;
+			return true;
+		}
+		schearch_sign(c, root->right, b + "1", out);
+		if (root->position.sign == c) {
+			//cout << b;
+			out += b;
+			return true;
+		}
+	}
+}
+
+bool save_dictonary(Node *node, string signs, string all_bits) {
+	struct element {
+		char sign;
+		string bits;
+	}el;
+	
+	ofstream File_dictonary;
+	File_dictonary.open("dictonary.txt", ios::out | ios::binary);
+	if (!File_dictonary) {
+		cout << "Cannot open file!" << endl;
+		return 1;
+	}
+
+	uint32_t len = all_bits.length(); //get length of the bits
+	File_dictonary.write((char*)&len, 4);	//save in dictonary lenght
+
+	string bits;
+	string bit = "";
+	for (uint8_t i = 0; i < signs.length(); i++) {
+		schearch_sign(signs[i], node, bit, bits );
+		el.sign = signs[i];
+		el.bits = bits;
+		bits = "";
+		File_dictonary.write((char*)&el, sizeof(el));
+	}
+	File_dictonary.close();
+}
+
+
+
 int main()
 {
-
-
 	Node* tree;
 
 	string input_txt;
 	string bytes_compressed;
+	string unique_signs;
+
 	getline(cin, input_txt);
 
 	create_list( &tree, input_txt );
 
 	sort_list( &tree );
+
+	unique_signs = get_unique_signs(tree);
 
 	generate_tree(&tree);
 	
@@ -280,6 +342,8 @@ int main()
 	cout << output_str;
 	
 	save_compress_file(output_str);
+
+	save_dictonary(tree, unique_signs, output_str);
 
 	read_compress_file();
 
