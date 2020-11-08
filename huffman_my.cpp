@@ -221,6 +221,41 @@ void delete_tree(Node* root) {
 	}
 }
 
+string read_compress_file(void) {
+	string output_bits;
+	uint8_t bit = 0;
+	ifstream File_in;
+	File_in.open("output.txt", ios::out | ios::binary);
+	if (!File_in) {
+		cout << "Cannot open file!" << endl;
+		return 0;
+	}
+
+	uint8_t byte = 0;
+	File_in.seekg(0, ios::end); //go to the end of the file
+	int file_size = File_in.tellg(); //get bytes number
+	File_in.seekg(0, ios::beg); //go back at the beginnig of the file
+
+	if (file_size == 0) {
+		cout << "nothing to read" << endl;
+		return 0;
+	}
+
+	for (uint16_t i = 0; i < file_size; i++) {
+		File_in.read((char*)&byte, 1); //read one byte
+		for (uint8_t j = 0; j < 8; j++) {
+			bit = byte & 0x80;  //0x80 1000 0000 <- mask // leave just last bit
+			if (bit)
+				output_bits += '1';
+			else
+				output_bits += '0';
+			byte = byte << 1;
+		}
+	}
+	return output_bits;
+	File_in.close();
+}
+
 int main()
 {
 
@@ -228,6 +263,7 @@ int main()
 	Node* tree;
 
 	string input_txt;
+	string bytes_compressed;
 	getline(cin, input_txt);
 
 	create_list( &tree, input_txt );
@@ -244,6 +280,8 @@ int main()
 	cout << output_str;
 	
 	save_compress_file(output_str);
+
+	read_compress_file();
 
 	delete_tree(tree);
 
