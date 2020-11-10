@@ -139,41 +139,18 @@ void generate_tree(Node** node) {
 	}
 }
 
-bool schearch_tree(char c, Node* root, string b) {
-	if( root != NULL ){
-		schearch_tree(c, root->left, b+"0");
-		if (root->position.sign == c) {
-			cout << b;
-			return true;
-		}
-		schearch_tree(c, root->right, b+"1");
-		if (root->position.sign == c) {
-			cout << b;
-			return true;
-		}
-	}
-}
-
-void Compress(Node* root, string input_txt){
-	for (uint32_t i = 0; i < input_txt.length(); i++) { 
-		schearch_tree(input_txt[i], root, "");
-		cout << " ";
-	}
-	cout << endl;
-}
-
 //function add to string the bits that represents particular sign
 bool get_compress_bits(char c, Node* root, string b ) {
 	if (root != NULL) {
 		get_compress_bits(c, root->left, b + "0");
 		if (root->position.sign == c) {
-			//cout << b;
+			cout << b;
 			output_str += b;
 			return true;
 		}
 		get_compress_bits(c, root->right, b + "1");
 		if (root->position.sign == c) {
-			//cout << b;
+			cout << b;
 			output_str += b;
 			return true;
 		}
@@ -182,8 +159,10 @@ bool get_compress_bits(char c, Node* root, string b ) {
 //store text bits in the string
 void get_bits(Node* node, string input_txt) {
 	string bytes;
+	cout << endl << "Compressed bits for particular sign in text" << endl;
 	for (uint32_t i = 0; i < input_txt.length(); i++) {  // code particular sign and store it in string variable
 		get_compress_bits(input_txt[i], node, "");
+		cout << " ";
 	}
 }
 
@@ -368,6 +347,7 @@ int main()
 	string bytes_compressed;
 	string unique_signs;
 
+	cout << "Put text to compress" << endl;
 	getline(cin, input_txt);
 
 	create_list( &tree, input_txt );
@@ -379,11 +359,10 @@ int main()
 	generate_tree(&tree);
 	
 	//useless function, it just print in the console the bit representation of the particular sign
-	Compress(tree, input_txt);
 
 	cout << endl;
 	get_bits(tree, input_txt);
-	cout << output_str;
+	//cout << output_str;
 	
 	save_compress_file(output_str);
 
