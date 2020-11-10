@@ -2,6 +2,7 @@
 #include <string>
 #include <stdint.h>
 #include <fstream>
+#include <sstream>
 
 using namespace std;
 
@@ -16,6 +17,11 @@ typedef struct node{
 	struct node* left;
 	struct node* right;
 }Node;
+
+struct element {
+	char sign;
+	string bits;
+};
 
 string output_str;
 
@@ -221,7 +227,7 @@ void delete_tree(Node* root) {
 	}
 }
 
-string read_compress_file(void) {
+string read_compress_file() {
 	string output_bits;
 	uint8_t bit = 0;
 	ifstream File_in;
@@ -252,8 +258,8 @@ string read_compress_file(void) {
 			byte = byte << 1;
 		}
 	}
-	return output_bits;
 	File_in.close();
+	return output_bits;
 }
 
 string get_unique_signs(Node *node) {
@@ -287,10 +293,8 @@ bool schearch_sign(char c, Node* root, string b, string &out) {
 }
 
 bool save_dictonary(Node *node, string signs, string all_bits) {
-	struct element {
-		char sign;
-		string bits;
-	}el;
+
+	element el;
 	
 	ofstream File_dictonary;
 	File_dictonary.open("dictonary.txt", ios::out | ios::binary);
@@ -315,6 +319,46 @@ bool save_dictonary(Node *node, string signs, string all_bits) {
 }
 
 
+void uncompress(string bytes_compressed) {
+	element *dictonary_el;
+	ifstream File_dictonary;
+	File_dictonary.open("dictonary.txt", ios::out | ios::binary);
+	uint32_t len = 0;
+	File_dictonary.read((char*)&len, 4); //read first 4 bytes that include a lenght
+
+	File_dictonary.seekg(0, ios::beg); //go back at the beginnig of the file
+	File_dictonary.seekg(0, ios::end); //go to the end of the file
+	int file_size = File_dictonary.tellg(); //get bytes number
+	File_dictonary.seekg(0, ios::beg); //go back at the beginnig of the file
+	File_dictonary.read((char*)&len, 4); //just to move pointer
+	file_size -= 4; //size of the dictonary data (without header with lenght)
+	uint32_t el_num = file_size / sizeof(element);
+	dictonary_el = new element[el_num];
+	//read dictonary data
+	for (uint32_t i = 0; i < el_num; i++) {
+			File_dictonary.read((char*)&dictonary_el[i], sizeof(element));
+	}
+
+	string bytes = "";
+	bool found = false;
+	cout << endl << "TEXT DECODED:" << endl;
+	for (uint32_t i = 0; i < bytes_compressed.length(); i++) {
+		bytes += bytes_compressed[i];
+		for (uint16_t j = 0; j < el_num; j++) {
+			if (bytes == dictonary_el[j].bits) {
+				cout << dictonary_el[j].sign;
+				found = true;
+				break;
+			}
+		}
+		if (found) {
+			bytes = "";
+			found = false;
+		}
+	}
+	cout << endl;
+	File_dictonary.close();
+}
 
 int main()
 {
@@ -345,7 +389,9 @@ int main()
 
 	save_dictonary(tree, unique_signs, output_str);
 
-	read_compress_file();
+	bytes_compressed = read_compress_file();
+
+	uncompress(bytes_compressed);
 
 	delete_tree(tree);
 
